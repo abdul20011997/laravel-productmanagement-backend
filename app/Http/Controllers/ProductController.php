@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,8 +13,11 @@ class ProductController extends Controller
     //get all products
     public function index(){
         $data=Product::all();
+        $category=Category::all();
+
         return response()->json([
-            'data'=>$data
+            'data'=>$data,
+            'category'=>$category
         ]);
     }
 
@@ -36,7 +40,6 @@ class ProductController extends Controller
             $data->title=$request->title;
             $data->description=$request->description;
             $data->category_id=$request->category;
-            $data->user_id=1;
 
 
             if($request->hasFile('image')){
@@ -89,7 +92,7 @@ class ProductController extends Controller
             $data->category_id=$request->category;
             if($request->hasFile('image')){
                 $validator=Validator::make($request->all(),[
-                    'image'=>'required | image | mimes:jpeg,jpg | max:1000'
+                    'image'=>'required | image | mimes:jpeg,jpg'
                 ]);
                 if($validator->fails()){
                     return response()->json([
@@ -97,7 +100,7 @@ class ProductController extends Controller
                     ]);
                 }
                 else{
-                    $destination='./storage/images/'.$data->thumbnail;
+                    $destination='./storage/images/'.$data->image;
                     if(File::exists($destination)){
                         File::delete($destination);
                     }
